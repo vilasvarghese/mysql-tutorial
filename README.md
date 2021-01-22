@@ -1,6 +1,4 @@
 # mysql-tutorial
-https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert
-
 ## Installation
 
 ```bash
@@ -19,10 +17,6 @@ SHOW DATABASES;
 CREATE DATABASE hello_world_db;
 ```
 
-```sql
-DROP DATABASE hello_world_db;
-```
-
 ### Select Activate Database
 
 ```sql
@@ -34,18 +28,6 @@ USE hello_world_db
 SELECT database();
 ```
 
-### Disable Strict Mode
-This amongst other things truncates data that are two long for a VARCHAR field with a warning 
-instead of giving an error. It requires the user to login again.
-
-```sql
-SET @@global.sql_mode=''
-``` 
-
-enable it again, like so;
-```sql
-SET @@sql_mode='STRICT_TRANS_TABLES';
-``` 
 
 ## Tables
 A database is a a collection of tables this is true for relational databases. 
@@ -92,7 +74,6 @@ SELECT * from cats;
 ```
 
 ### Bulk Insertion
-https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019440?start=0
 ```sql
 INSERT INTO cats(name, age)
 VALUES ('Peanut', 2),
@@ -110,7 +91,6 @@ SHOW WARNINGS;
 Examples of warnings are inserting strings that are above the maximum limit for a VARCHAR
 
 ### NULL and NOT NULL
-https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019712?start=0
 
 If not specified otherwise a column in a table is allays nullable meaning that the column value
 doesn't have to be specified on insertion. To override this behaviour add NOT NULL to the column
@@ -128,7 +108,6 @@ This will result in a warning about the column not having a default value and My
 pick one anyway. The default for an INT is 0.
 
 ### Settings Default Values
-https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019744?start=0
 
 ```sql
 CREATE TABLE cats3( name VARCHAR(100) DEFAULT 'unnamed', age INT DEFAULT 99);
@@ -159,7 +138,6 @@ ERROR: 1048 (23000): Column 'age' cannot be null
 ```
 
 ### A Primer in Primary keys
-https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019750?start=0
 A unique identifier for a row and thereby a unique entity of a collection.
 
 ```sql
@@ -219,7 +197,7 @@ And each of the inserts will be treated as a separate entity.
 ## CRUD
 
 ### Sample data
-https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019756?start=0
+
 
 ```sql
 -- Let's drop the existing cats table:
@@ -249,7 +227,6 @@ VALUES ('Ringo', 'Tabby', 4),
 ```
 
 ## C(R)UD
-https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019758?start=0
 
 ```sql
 SELECT * FROM cats;
@@ -263,7 +240,6 @@ SELECT name, age FROM cats;
 ```
 
 ## Filter the results by value using `WHERE`
-https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019760?start=0
 ```sql
 SELECT * FROM cats WHERE age=4;
 ```
@@ -280,8 +256,6 @@ Will result in:
 
 `WHERE` statements matching strings are case insensitive by default.
 
-https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019764?start=0
-
 `WHERE` statements can match either user input or values of other columns, like so:
 ```sql
 SELECT * FROM cats WHERE cat_id=age;
@@ -289,7 +263,6 @@ SELECT * FROM cats WHERE cat_id=age;
 This will retrieve a list of all cats that has a `cat_id` that is equal to their `age`
 
 ### Aliases
-https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019766?start=0
 
 It is possible to rename the output of some fields using an alias, like so:
 ```sql
@@ -297,7 +270,6 @@ SELECT cat_id as id, name FROM cats;
 ```
 
 ## CR(U)D Update
-https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019770?start=0
 
 
 How do we alter existing database
@@ -311,7 +283,7 @@ UPDATE cats SET breed='Shorthair' WHERE breed='Tabby';
 the correct data was targeted*  
 
 ### Samples
-https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019772?start=0
+
 ```sql
 SELECT * FROM cats WHERE name='Jackson';
  
@@ -337,7 +309,6 @@ SELECT * FROM cats WHERE breed='Maine Coon';
 ```
 
 ## CRU(D) Delete
-https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019774?start=0
 ```sql
 -- Delete all cats named 'Egg' from the table `cats`
 DELETE FROM cats WHERE name='Egg';
@@ -351,11 +322,12 @@ the correct data was targeted*
 
 ## Running SQL Files
 
-https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019786?start=0
 
 1. Start the CLI by
    ```bash
-   mysqlsh --sql -P3306 -h127.0.0.1 -uroot -ppassword
+      mysql -u root -p
+
+      mysqlsh --sql -P3306 -h127.0.0.1 -u root -p password
    ```
 2. Source the file within the CLI, like so:
    ```
@@ -363,8 +335,6 @@ https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert
    ```
 
 ## Insert Book Sample data
-
-https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019788?start=0
 
 1. Start the CLI by
    ```bash
@@ -387,8 +357,6 @@ https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert
 ### CONCAT
 [MySQL Reference Manual - CONCAT](https://dev.mysql.com/doc/refman/8.0/en/string-functions.html#function_concat)
 Combine data for cleaner output
-
-https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019796?start=0
 
 #### Combine author first name and last name into one column called `Name`
 ```sql
@@ -447,7 +415,6 @@ Results in:
 +------------------------------------------------------------------------+
 ```
 ## SUBSTRING
-* [The Ultimate MySQL bootcamp - Introducing SUBSTRING](https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019798?start=0)
 * [MySQL Reference Manual - SUBSTRING](https://dev.mysql.com/doc/refman/8.0/en/string-functions.html#function_substring)
 
 ```sql
@@ -524,7 +491,6 @@ Results in:
 Looks nice doesn't it 
 
 ### REPLACE
-* [The Ultimate MySQL bootcamp - Introducing REPLACE](https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019800?start=0)
 * [MySQL Reference Manual - REPLACE](https://dev.mysql.com/doc/refman/8.0/en/string-functions.html#function_replace)
 
 
@@ -539,7 +505,6 @@ SELECT SUBSTRING(REPLACE(title, 'e', '3'), 1, 20) as 'Weird String' from books;
 ```
 
 ### REVERSE
-* [The Ultimate MySQL bootcamp - Introducing REVERSE](https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019802?start=0)
 * [MySQL Reference Manual - REVERSE](https://dev.mysql.com/doc/refman/8.0/en/string-functions.html#function_reverse)
 
 ```sql
@@ -556,7 +521,6 @@ Results in:
 ```
 
 ### CHAR_LENGTH
-* [The Ultimate MySQL bootcamp - Introducing CHAR_LENGTH](https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019804?start=0)
 * [MySQL Reference Manual - CHAR_LENGTH](https://dev.mysql.com/doc/refman/8.0/en/string-functions.html#function_char-length)
 
 ```sql
@@ -594,7 +558,6 @@ SELECT LOWER('Hello World');
 ## Refining our Selections
 
 ### More sample data into `books`
-* [The Ultimate MySQL bootcamp - Adding A Couple New Books](https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019814?start=0)
 
 ```sql
 INSERT INTO books (title, author_fname, author_lname, released_year, stock_quantity, pages)
@@ -604,7 +567,6 @@ INSERT INTO books (title, author_fname, author_lname, released_year, stock_quant
 ```
 
 ## DISTINCT
-* [The Ultimate MySQL bootcamp - Using DISTINCT](https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019816?start=0)
 
 The `DISTINCT` keyword comes straight after `SELECT` and only retrieves the unique entries of values
 in a column. 
@@ -641,7 +603,6 @@ SELECT DISTINCT author_fname, author_lname FROM books;
 
 ## ORDER BY
 
-* [The Ultimate MySQL bootcamp - ORDER BY](https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019818?start=0)
 
 Orders results by the values in a column.
 
@@ -654,7 +615,6 @@ SELECT DISTINCT author_fname, author_lname FROM books ORDER BY author_lname;
 
 ## LIMIT
 
-* [The Ultimate MySQL bootcamp - LIMIT](https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019820?start=0)
 
 
 Get all columns of the first record from the table `books`
@@ -669,8 +629,6 @@ SELECT * FROM books LIMIT 2,5;
 
 ## LIKE
 
-* [The Ultimate MySQL bootcamp - LIKE](https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019822?start=0)
-* [The Ultimate MySQL bootcamp - LIKE Part2](https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019824?start=0)
 
 
 Matches parts of column values
@@ -716,7 +674,6 @@ SELECT title FROM books WHERE title LIKE '%\_%' ;
 
 ### COUNT
 
-* [The Ultimate MySQL bootcamp - COUNT](https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019828?start=0)
 
 How many books are in our database?
 ```sql
@@ -764,7 +721,6 @@ SELECT COUNT(*) FROM books WHERE title LIKE '%the%';
 
 ### GROUP BY
 
-* [The Ultimate MySQL bootcamp - GROUP BY](https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019830?start=0)
 
 `GROUP BY` shows records based on groups in a column. 
 
@@ -808,7 +764,6 @@ Which will avoid duplicated `author_lname`
 
 ### MIN and MAX
 
-* [The Ultimate MySQL bootcamp - MIN and MAX](https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019832?start=0)
 
 Get the earliest released book from table `books`
 
@@ -821,7 +776,6 @@ Get the latest released book from table `books`
 SELECT MAX(released_year) FROM books;
 ```
 
-* [The Ultimate MySQL bootcamp - A Problem with MIN and MAX](https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019834?start=0)
 Get the book with the least pages in the `books` table
 ```sql
 SELECT * FROM books WHERE pages = (SELECT Min(pages) FROM books);
@@ -836,7 +790,6 @@ SELECT title, pages FROM books ORDER BY pages LIMIT 1;
 ```
 
 ### MIN and MAX in combination with GROUP BY
-* [The Ultimate MySQL bootcamp - MIN and MAX in combination with GROUP BY](https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019836?start=0)
 
 Get the first released book for all authors
 ```sql
@@ -846,7 +799,6 @@ GROUP BY author_lname, author_fname;
 ```
 
 ### SUM
-* [The Ultimate MySQL bootcamp - SUM](https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019838?start=0)
 
 Calculate the total amount of pages from all books in the `books` tables
 ```sql
@@ -860,7 +812,6 @@ SELECT author_fname, author_lname, SUM(pages) from books GROUP BY author_fname, 
 
 ### AVG
 
-* [The Ultimate MySQL bootcamp - AVG](https://www.udemy.com/the-ultimate-mysql-bootcamp-go-from-sql-beginner-to-expert/learn/v4/t/lecture/7019840?start=0)
 
 Calculate the average release year of all books in the `books` tables
 ```sql
