@@ -1,8 +1,11 @@
+
+
 # mysql-tutorial
 ## Installation
 
 ```bash
-docker-compose up -d
+#docker-compose up -d
+
 ```
 
 ## Databases
@@ -922,4 +925,40 @@ FROM emp
 JOIN dept ON emp.dept_id = dept.dept_id
 GROUP BY emp.emp_id, emp.emp_name, emp.emp_job, dept.dept_name
 ORDER BY dept.dept_name;
+```
+
+	Example of having query
+
+```sql
+SELECT dept.dept_name, AVG(emp.emp_salary) AS avg_salary
+FROM emp
+JOIN dept ON emp.dept_id = dept.dept_id
+GROUP BY dept.dept_name
+HAVING AVG(emp.emp_salary) >= 4000;
+```
+
+	Example of sub query
+
+```sql
+SELECT emp_id, emp_name, emp_salary, dept_id
+FROM emp
+WHERE emp_salary > (
+  SELECT AVG(emp_salary)
+  FROM emp
+  WHERE dept_id = emp.dept_id
+);
+```
+
+### Alter table Drop Tables
+
+Example of alter table command
+
+```sql
+ALTER TABLE emp
+ADD emp_email VARCHAR(100);
+```
+
+Example of drop table command
+```sql
+DROP TABLE emp;
 ```
