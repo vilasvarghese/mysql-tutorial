@@ -829,3 +829,97 @@ SELECT author_fname, author_lname, AVG(PAGES) FROM books GROUP BY author_lname, 
 ```
 
 
+### Emp and Dept Table
+
+```sql
+CREATE TABLE dept (
+  dept_id INT PRIMARY KEY,
+  dept_name VARCHAR(50)
+);
+
+CREATE TABLE emp (
+  emp_id INT PRIMARY KEY,
+  emp_name VARCHAR(50),
+  emp_job VARCHAR(50),
+  emp_salary DECIMAL(10,2),
+  dept_id INT,
+  FOREIGN KEY (dept_id) REFERENCES dept(dept_id)
+);
+
+
+INSERT INTO dept (dept_id, dept_name)
+VALUES
+  (1, 'IT'),
+  (2, 'Development'),
+  (3, 'Support'),
+  (4, 'Marketing'),
+  (5, 'Sales'),
+  (6, 'Human Resources'),
+  (7, 'Finance'),
+  (8, 'Operations'),
+  (9, 'Research and Development'),
+  (10, 'Quality Assurance');
+
+
+INSERT INTO emp (emp_id, emp_name, emp_job, emp_salary, dept_id)
+VALUES
+  (1, 'John', 'Manager', 5000, 1),
+  (2, 'Lisa', 'Developer', 4000, 2),
+  (3, 'David', 'Analyst', 3500, 1),
+  (4, 'Sarah', 'Designer', 3000, 2),
+  (5, 'Mark', 'Technician', 2500, 3),
+  (50, 'Emily', 'Administrator', 2800, 10);
+```
+
+
+
+### Examples of Join queries
+
+```sql
+   
+```
+Retrieve employee details with their corresponding department names:
+
+```sql
+
+SELECT emp.emp_id, emp.emp_name, emp.emp_job, emp.emp_salary, dept.dept_name
+FROM emp
+JOIN dept ON emp.dept_id = dept.dept_id;
+```
+    Get a list of employees along with their department names, sorted by department:
+
+```sql
+
+SELECT emp.emp_id, emp.emp_name, emp.emp_job, emp.emp_salary, dept.dept_name
+FROM emp
+JOIN dept ON emp.dept_id = dept.dept_id
+ORDER BY dept.dept_name;
+```
+    Find employees in the "IT" department:
+
+```sql
+
+SELECT emp.emp_id, emp.emp_name, emp.emp_job, emp.emp_salary
+FROM emp
+JOIN dept ON emp.dept_id = dept.dept_id
+WHERE dept.dept_name = 'IT';
+```
+    Calculate the average salary for each department:
+
+```sql
+
+SELECT dept.dept_name, AVG(emp.emp_salary) AS avg_salary
+FROM emp
+JOIN dept ON emp.dept_id = dept.dept_id
+GROUP BY dept.dept_name;
+```
+    Retrieve employee details along with their department name and total salary, sorted by department:
+
+```sql
+
+SELECT emp.emp_id, emp.emp_name, emp.emp_job, dept.dept_name, SUM(emp.emp_salary) AS total_salary
+FROM emp
+JOIN dept ON emp.dept_id = dept.dept_id
+GROUP BY emp.emp_id, emp.emp_name, emp.emp_job, dept.dept_name
+ORDER BY dept.dept_name;
+```
