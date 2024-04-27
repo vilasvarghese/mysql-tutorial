@@ -3,6 +3,25 @@
 # mysql-tutorial
 ## Installation
 
+	Get ubuntu 20.04 machine 		
+		https://docs.rackspace.com/docs/install-mysql-server-on-the-ubuntu-operating-system
+		UPDATE mysql.user SET authentication_string = PASSWORD('mypwd') WHERE User = 'root';
+		
+	In ubuntu 22.04
+		update password was done using 
+		ALTER USER 'root'@'localhost' IDENTIFIED BY 'Vilas123';
+		
+
+	In ubuntu 24.04
+		update password was done using 
+		sudo mysql --defaults-file=/etc/mysql/debian.cnf
+		ALTER USER 'root'@'localhost' IDENTIFIED BY 'Vilas123';
+		
+		quit;
+		systemctl restart mysql 
+		mysql -u root -p 
+		
+		
 ```bash
 #docker-compose up -d
 
@@ -100,7 +119,7 @@ doesn't have to be specified on insertion. To override this behaviour add NOT NU
 declaration in the `CREATE TABLE` statement.
 
 ```sql
-CREATE TABLE cats 
+CREATE TABLE cats1
 ( 
     name VARCHAR(50) NOT NULL, 
     age INT NOT NULL 
@@ -120,6 +139,7 @@ INSERT INTO cats3(age) VALUES(13);
 This results in a table like:
 
 ```
+select * from cats3;
 +---------+-----+
 | name    | age |
 +---------+-----+
@@ -168,11 +188,13 @@ A Primary Key must be Unique so the this will lead to an error:
 ```sql
 INSERT INTO unique_cats(cat_id, name, age) VALUES(1, 'Fred', 23);
 INSERT INTO unique_cats(cat_id, name, age) VALUES(1, 'James', 3);
+
+show warnings;
 ```
 ```
 ERROR: 1062 (23000): Duplicate entry '1' for key 'PRIMARY'
 ```
-It is common to use the username as the Primary Key
+It is not common to use the username as the Primary Key
 
 
 It is redundant to have to specify the id of the row manually for each insertion. The 
@@ -196,6 +218,72 @@ INSERT INTO unique_cats2 (name, age) VALUES('Jiff', 3) ;
 
 And each of the inserts will be treated as a separate entity.
 
+
+
+Not null and unique key constraints 
+```sql
+drop table unique_cats;
+CREATE TABLE unique_cats(
+  cat_id INT NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  age INT,
+  PRIMARY KEY (cat_id, name)
+);
+
+or 
+
+ALTER TABLE unique_cats
+ADD CONSTRAINT unique_name
+UNIQUE (name);
+
+or 
+
+
+CREATE TABLE unique_cats(
+  cat_id INT NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  age INT,
+  PRIMARY KEY (cat_id, name),
+  UNIQUE (name)
+);
+
+
+Verify by executing 
+ SHOW CREATE TABLE unique_cats;
+
+```
+
+
+Check key constraint 
+
+
+```sql
+drop table unique_cats;
+CREATE TABLE unique_cats(
+  cat_id INT NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  age INT,
+  PRIMARY KEY (cat_id, name),
+  CHECK (age <= 20)  -- Add the check constraint here
+);
+or 
+
+CREATE TABLE unique_cats(
+  cat_id INT NOT NULL,
+  name VARCHAR(100) NOT NULL,
+  age INT,
+  PRIMARY KEY (cat_id, name)
+);
+
+
+ALTER TABLE unique_cats
+ADD CONSTRAINT check_age CHECK (age <= 20);
+
+Verify
+INSERT INTO unique_cats (cat_id, name, age) VALUES(1, 'Skippy', 4) ;
+INSERT INTO unique_cats (cat_id, name, age) VALUES(2, 'Pippy', 24) ;
+
+```
 
 ## CRUD
 
@@ -279,7 +367,7 @@ How do we alter existing database
 
 Change all cats that are of `breed` 'Tabby' to `breed` 'Shorthair'
 ```sql
-UPDATE cats SET breed='Shorthair' WHERE breed='Tabby';
+	UPDATE cats SET breed='Shorthair' WHERE breed='Tabby';
 ```
 
 *Always do a `SELECT` statement to test the `UPDATE` statement to make sure that
@@ -421,7 +509,7 @@ Results in:
 * [MySQL Reference Manual - SUBSTRING](https://dev.mysql.com/doc/refman/8.0/en/string-functions.html#function_substring)
 
 ```sql
-SELECT SUBSTRING('Hello World', 1, 4);
+SELECT SUBSTRING('Hello World', 1, 2);
 ```
 
 Results in:
@@ -429,7 +517,7 @@ Results in:
 +-------------------------------+
 | SUBSTRING('Hello World', 1, 4) |
 +-------------------------------+
-| Hell                          |
+| He                          	 |
 +-------------------------------+
 ```
 
@@ -729,7 +817,7 @@ SELECT COUNT(*) FROM books WHERE title LIKE '%the%';
 
 The output of this query is a bit confusing since it only shows the first book of each group.
 ```sql
-SELECT title, author_lname FROM books GROUP BY author_lname;
+SELECT count(title), author_lname FROM books GROUP BY author_lname;
 ```
 
 By combining the `GROUP BY` with a `COUNT` it is easier to understand what is going on.
@@ -779,7 +867,7 @@ Get the latest released book from table `books`
 SELECT MAX(released_year) FROM books;
 ```
 
-Get the book with the least pages in the `books` table
+Get the book with the minimum pages in the `books` table
 ```sql
 SELECT * FROM books WHERE pages = (SELECT Min(pages) FROM books);
 ```
@@ -885,9 +973,16 @@ Retrieve employee details with their corresponding department names:
 
 ```sql
 
-SELECT emp.emp_id, emp.emp_name, emp.emp_job, emp.emp_salary, dept.dept_name
+SELECT 
+	emp.emp_id, 
+	emp.emp_name, 
+	emp.emp_job, 
+	emp.emp_salary, 
+	dept.dept_name
 FROM emp
-JOIN dept ON emp.dept_id = dept.dept_id;
+JOIN dept 
+ON 
+	emp.dept_id = dept.dept_id;
 ```
     Get a list of employees along with their department names, sorted by department:
 
@@ -949,6 +1044,134 @@ WHERE emp_salary > (
 );
 ```
 
+
+###
+
+Find all departments with no employees:
+```sql
+
+SELECT d.dept_name
+FROM dept d
+LEFT JOIN emp e ON d.dept_id = e.dept_id
+WHERE e.dept_id IS NULL;
+```
+
+ Find the average salary for each department:
+
+```sql
+
+SELECT d.dept_name, AVG(e.emp_salary) AS avg_salary
+FROM emp e
+INNER JOIN dept d ON e.dept_id = d.dept_id
+GROUP BY d.dept_name;
+
+```
+
+ Find the total number of employees in each department:
+
+```sql
+SELECT d.dept_name, COUNT(*) AS num_employees
+FROM emp e
+INNER JOIN dept d ON e.dept_id = d.dept_id
+GROUP BY d.dept_name;
+```
+ Find the department with the highest average salary:
+
+
+```sql
+SELECT d.dept_name, AVG(e.emp_salary) AS avg_salary
+FROM emp e
+INNER JOIN dept d ON e.dept_id = d.dept_id
+GROUP BY d.dept_name
+ORDER BY avg_salary DESC
+LIMIT 1;
+```
+
+
+Find the total salary paid to all employees in the company:
+```sql
+SELECT SUM(emp_salary) AS total_payroll
+FROM emp;
+```
+Find employees who don't belong to any department (assuming dept_id can be NULL in emp table):
+
+
+```sql
+SELECT *
+FROM emp
+WHERE dept_id IS NULL;
+```
+
+
+Find the department names and the number of employees in each department with at least 2 employees:
+```sql
+SELECT d.dept_name, COUNT(*) AS num_employees
+FROM emp e
+INNER JOIN dept d ON e.dept_id = d.dept_id
+GROUP BY d.dept_name
+HAVING COUNT(*) >= 2;
+```
+
+Following query doesn't work as manager_id column is missing.
+Find employees who earn more than their manager (assuming there's a manager_id column in emp table):
+```sql
+SELECT e1.emp_name, e1.emp_salary, m.emp_name AS manager_name, m.emp_salary AS manager_salary
+FROM emp e1
+INNER JOIN emp m ON e1.manager_id = m.emp_id
+WHERE e1.emp_salary > m.emp_salary;
+```
+
+Find the department with the most employees who have the job title 'Developer':
+
+```sql
+SELECT d.dept_name, COUNT(*) AS num_developers
+FROM emp e
+INNER JOIN dept d ON e.dept_id = d.dept_id
+WHERE emp_job = 'Developer'
+GROUP BY d.dept_name
+ORDER BY num_developers DESC
+LIMIT 1;
+```
+
+
+
+```sql
+
+```
+
+```sql
+
+```
+
+
+
+```sql
+
+```
+
+
+```sql
+
+```
+
+
+
+```sql
+
+```
+
+
+```sql
+
+```
+
+
+```sql
+
+```
+
+
+
 ### Alter table Drop Tables
 
 Example of alter table command
@@ -962,3 +1185,5 @@ Example of drop table command
 ```sql
 DROP TABLE emp;
 ```
+
+
