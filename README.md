@@ -251,6 +251,10 @@ CREATE TABLE unique_cats(
 Verify by executing 
  SHOW CREATE TABLE unique_cats;
 
+
+
+#To add auto_increment latter 
+ALTER TABLE unique_cats MODIFY COLUMN cat_id INT auto_increment;
 ```
 
 
@@ -1134,9 +1138,209 @@ LIMIT 1;
 ```
 
 
+#INDEXES
+#-------
+References: 
+https://dev.mysql.com/doc/refman/8.0/en/mysql-indexes.html
+https://www.youtube.com/watch?v=kv3jC0P4gOc
+https://www.tutorialspoint.com/mysql/mysql-unique-index.htm
+https://www.digitalocean.com/community/tutorials/how-to-use-indexes-in-mysql
 
 ```sql
 
+CREATE DATABASE indexes;
+USE indexes;
+
+CREATE TABLE employees (
+    employee_id int,
+    first_name varchar(50),
+    last_name varchar(50),
+    device_serial varchar(15),
+    salary int
+);
+
+INSERT INTO employees VALUES
+    (1, 'John', 'Smith', 'ABC123', 60000),
+    (2, 'Jane', 'Doe', 'DEF456', 65000),
+    (3, 'Bob', 'Johnson', 'GHI789', 70000),
+    (4, 'Sally', 'Fields', 'JKL012', 75000),
+    (5, 'Michael', 'Smith', 'MNO345', 80000),
+    (6, 'Emily', 'Jones', 'PQR678', 85000),
+    (7, 'David', 'Williams', 'STU901', 90000),
+    (8, 'Sarah', 'Johnson', 'VWX234', 95000),
+    (9, 'James', 'Brown', 'YZA567', 100000),
+    (10, 'Emma', 'Miller', 'BCD890', 105000),
+    (11, 'William', 'Davis', 'EFG123', 110000),
+    (12, 'Olivia', 'Garcia', 'HIJ456', 115000),
+    (13, 'Christopher', 'Rodriguez', 'KLM789', 120000),
+    (14, 'Isabella', 'Wilson', 'NOP012', 125000),
+    (15, 'Matthew', 'Martinez', 'QRS345', 130000),
+    (16, 'Sophia', 'Anderson', 'TUV678', 135000),
+    (17, 'Daniel', 'Smith', 'WXY901', 140000),
+    (18, 'Mia', 'Thomas', 'ZAB234', 145000),
+    (19, 'Joseph', 'Hernandez', 'CDE567', 150000),
+    (20, 'Abigail', 'Smith', 'FGH890', 155000);
+	
+
+EXPLAIN SELECT * FROM employees WHERE salary = 100000;	
+
+Description of each field 
+	id: 
+		unique identifier to each row in the output
+		typically 
+			in the order the operations are considered 
+				in the query plan.
+	select_type: 
+		type of join or operation being performed in the query. 
+		SIMPLE
+			straightforward table access without joins.
+	table: 
+		table(s) involved in the query. 
+		employees
+			query selects data only from that table.
+	partitions: 
+		if table partitioning is being used. 
+		NULL
+			partitioning is not relevant to this query.
+	type: 
+		type of table access used. 
+		ALL
+			engine will scan all rows in the employees table. 
+				an index could potentially be used to optimize the query.
+	possible_keys: 
+		lists any indexes that could potentially be used 
+			to speed up the query. 
+		NULL
+			there are no relevant indexes for this specific query.
+	key: 
+		actual index used in the query plan. 
+		NULL
+			indicating no index is being used.
+	key_len: 
+		length of the index used, if any. 
+		Since no index is used, it's NULL.
+	ref: 
+		table referenced in a join (if applicable). 
+		As this is a simple table access without joins, it's NULL.
+	rows: 
+		estimation of the number of rows the engine expects to examine 
+			based on the chosen plan. 
+		20
+			indicating the engine anticipates looking at 20 rows from the employees table.
+	filtered: 
+		estimated percentage of rows that will pass the WHERE clause condition. 
+		10.00
+			engine expects roughly 10% of the 20 rows (around 2 rows) 
+				to meet the salary = 100000 condition.
+	Extra: 
+		This column provides additional information about the query execution plan. 
+		Here, it mentions "Using where", signifying that a table scan will be used with a filter based on the WHERE clause condition.
+
+
+
+
+EXPLAIN analyze SELECT * FROM employees WHERE salary = 100000;	
+	Filter: (employees.salary = 100000)
+		Cost: measure of i/o operation 
+
+		: This indicates a filtering operation will be applied based on the condition employees.salary = 100000.
+			cost=2.25 rows=2: This is the estimated cost (usually in units of I/O operations) of applying the filter. It's estimated to process 2 rows.
+			(actual time=0.0486..0.0726 rows=1 loops=1): This section from ANALYZE shows the actual execution details.
+				actual time=0.0486..0.0726: The actual time taken to execute the filter, ranging from 0.0486 to 0.0726 seconds.
+				rows=1: The actual number of rows that passed the filter (1 in this case).
+				loops=1: The number of times the filter was applied (usually 1 for single-pass filtering).
+
+	ANALYZE Section:
+
+		-> Table scan on employees (cost=2.25 rows=20) (actual time=0.026..0.0551 rows=20 loops=1): 
+			This part details the table access method used.
+			Table scan on employees: This signifies the engine will scan all rows in the employees table.
+			(cost=2.25 rows=20): 
+				Similar to the filter section
+					estimated cost and 
+					number of rows to be scanned 
+					(20 in this case).
+			(actual time=0.026..0.0551 rows=20 loops=1): The actual execution details from ANALYZE.
+				actual time=0.026..0.0551: The actual time taken to scan the table, ranging from 0.026 to 0.0551 seconds.
+				rows=20: The actual number of rows scanned from the employees table (20 in this case).
+				loops=1: The number of times the table scan was performed (typically 1).
+
+
+EXPLAIN SELECT * FROM employees WHERE salary < 70000;
+
+EXPLAIN analyze SELECT * FROM employees WHERE salary < 70000;
+
+CREATE INDEX salary ON employees(salary);
+GRANT INDEX on *.* TO 'user'@'localhost';
+FLUSH PRIVILEGES;
+EXPLAIN SELECT * FROM employees WHERE salary = 100000;
+EXPLAIN analyze SELECT * FROM employees WHERE salary = 100000;
+
+EXPLAIN SELECT * FROM employees WHERE salary < 70000;
+EXPLAIN analyze SELECT * FROM employees WHERE salary < 70000;
+
+EXPLAIN SELECT * FROM employees WHERE salary < 140000;
+EXPLAIN analyze SELECT * FROM employees WHERE salary < 140000;
+
+
+CREATE UNIQUE INDEX device_serial ON employees(device_serial);
+
+INSERT INTO employees VALUES (21, 'Sammy', 'Smith', 'ABC123', 65000);
+	error if there is already same data 
+	EXPLAIN SELECT * FROM employees WHERE device_serial = 'ABC123';
+	
+	
+	
+EXPLAIN SELECT * FROM employees WHERE last_name = 'Smith' AND first_name = 'John';
+EXPLAIN analyze SELECT * FROM employees WHERE last_name = 'Smith' AND first_name = 'John';
+	
+CREATE INDEX names ON employees(last_name, first_name);
+EXPLAIN SELECT * FROM employees WHERE last_name = 'Smith' AND first_name = 'John';
+EXPLAIN analyze SELECT * FROM employees WHERE last_name = 'Smith' AND first_name = 'John';
+
+EXPLAIN SELECT * FROM employees WHERE last_name = 'Smith';
+EXPLAIN analyze SELECT * FROM employees WHERE last_name = 'Smith';
+
+EXPLAIN SELECT * FROM employees WHERE first_name = 'John';	
+EXPLAIN analyze SELECT * FROM employees WHERE first_name = 'John';	
+
+SHOW INDEXES FROM employees;
+DROP INDEX device_serial ON employees;
+
+
+The output you provided is the result of the SHOW INDEXES FROM employees statement in MySQL. It displays information about all the indexes that exist on the table named 
+
+employees. Let's break down each column and explain its significance:
+
+    Table: This column shows the name of the table to which the index belongs (in this case, employees).
+    Non_unique: This indicates whether the index allows duplicate values in the indexed columns.
+        0 signifies a unique index, meaning no rows can have the same combination of values in the indexed columns.
+        1 indicates a non-unique index, which allows duplicate values.
+    Key_name: This column displays the name assigned to the index.
+    Seq_in_index: This column specifies the order of the columns within a composite index. For single-column indexes, it's always 1.
+    Column_name: This column shows the name of the table column that is part of the index.
+    Collation: This column indicates the character set and sorting order used for the indexed column.
+    Cardinality: This is an estimated number of distinct values in the indexed column(s). A lower cardinality suggests fewer unique values, potentially leading to more efficient lookups using the index.
+    Sub_part: This column can be NULL or a value between 1 and the column length, indicating if only a portion of the column is included in the index.
+    Packed: This column is usually NULL but can be YES for certain storage formats that compress data within the index.
+    Null: This indicates whether the indexed column allows null values.
+        YES signifies null values are allowed in the indexed column.
+        NO means null values are not allowed.
+    Index_type: This column shows the type of index used. In this case, all indexes are of type BTREE (B-Tree), a common and efficient indexing structure.
+    Comment: This column is usually empty but can contain any comments associated with the index.
+    Index_comment: This column can contain comments about the purpose of the index.
+    Visible: This column indicates whether the index is visible to the optimizer for query planning.
+        YES signifies the index is considered by the optimizer when choosing an execution plan.
+        NO means the index is not currently being considered.
+    Expression: This column can be NULL or contain an expression used in the index definition, if applicable.
+
+In your specific output:
+
+    The table employees has four indexes:
+        device_serial (single-column unique index)
+        salary (single-column non-unique index)
+        names (composite non-unique index on last_name and then first_name)
+    The cardinality for salary and last_name is relatively low (20 and 16 respectively), suggesting these indexes could be helpful for filtering or sorting based on those columns.	
 ```
 
 ```sql
