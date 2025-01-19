@@ -1,0 +1,50 @@
+
+
+Database Fundamentals - 
+	Database Concepts and Architecture, 
+		refer notes 
+	Relational Database Management Systems (RDBMS), 
+		refer notes 
+	Tables and Relationships, 
+			refer notes 
+		Primary Keys and
+			refer notes 
+		Foreign Keys, 
+			refer notes 
+	SQL Basics 
+		(SELECT, INSERT, UPDATE, DELETE), 
+			refer notes 
+		Normalization, 
+			refer notes 
+		Transactions and
+			refer notes 
+		ACID Properties,
+			refer notes 
+		Indexes, 
+			refer notes 
+		Database Design,
+			refer notes
+		Backup and Recovery
+
+
+Create a relational database with tables and 
+	define 
+		primary and 
+		foreign keys 
+			to establish relationships.
+Perform basic SQL operations (
+	SELECT, 
+	INSERT, 
+	UPDATE, 
+	DELETE) 
+		on the created tables.
+Normalize a table structure to 
+	eliminate redundancy and 
+	apply proper indexes for performance.
+Write a transaction 
+	that adheres to 
+		ACID properties and 
+		ensure database integrity.
+Design and implement a 
+	backup and 
+	recovery strategy for your database.

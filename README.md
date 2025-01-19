@@ -1391,3 +1391,39 @@ DROP TABLE emp;
 ```
 
 
+
+
+
+Write a transaction that adheres to ACID properties and ensure database integrity.
+
+```sql
+START TRANSACTION;
+
+-- 1. Update customer balance
+UPDATE employees 
+SET last_name = 'Vilas Varghese' 
+WHERE employee_id = 1;
+
+-- 2. Insert transaction record
+INSERT INTO employees (employee_id, first_name, last_name, device_serial,salary) 
+VALUES (201, 'Dilmon','Thomas',12, 987654);
+
+-- 3. If any of the above operations fail, rollback the transaction
+COMMIT; 
+
+START TRANSACTION;
+
+-- 1. Update customer balance
+UPDATE employees 
+SET last_name = 'Jansi ki Rani' 
+WHERE employee_id = 1;
+
+-- 2. Insert transaction record
+INSERT INTO employees (employee_id, first_name, last_name, device_serial,salary) 
+VALUES (202, 'Lakshmi','Bahi',15, 987654);
+
+-- 3. If any of the above operations fail, rollback the transaction
+ROLLBACK; 
+
+
+```

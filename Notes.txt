@@ -36,10 +36,14 @@ Key concepts of RDBMS:
 				a unique identifier for each record. 
 				eliminates duplicate data entries. 
 				e.g. empId in emp table 
+				cannot be null
 			foreign keys 
 				reference primary keys in other tables
 				establishing relationships between them.
 				e.g. deptId in emp table 
+			unique keys
+				unique and null 
+				one data can be null 
 	Relationships: 
 		Tables are not isolated data silos. 
 		RDBMS allows you to define relationships between tables. 
@@ -53,6 +57,11 @@ Key concepts of RDBMS:
 			insert new records
 			updat existing data
 			delete data.
+			CRUD:
+				create 
+				read 
+				update 
+				delete
 	
 Benefits of RDBMS:
 	Structured Data Organization: 
@@ -61,6 +70,7 @@ Benefits of RDBMS:
 				understand, 
 				manage, and 
 				query.
+				
 	Data Integrity: 
 		ACID properties 
 			ensure 
@@ -76,12 +86,29 @@ Benefits of RDBMS:
 			standardized language for 
 				querying and 
 				managing data.
+			Modify the schema 
+				DDL
+					data definition language 
+					create, drop, truncate 
+				DML 
+					data manupulation language 
+					insert, update, delete
+				DCL
+					data control language 
+					grant and revoke 
+				DQL
+					data query language 
+					select 
+				TCL
+					transaction control language 
+					
 	Scalability: 
 		RDBMS can scale to accommodate 
 			large datasets and 
 			high volumes 
 				of transactions.
-
+		But cannot scale like no-sql 
+		
 
 
 Transaction: 
@@ -95,8 +122,204 @@ Transaction:
 		rollback 
 		
 Phantom Reads
+-------------
+	In database systems
+		a Phantom Read 
+			type of concurrency anomaly 
+				that can occur when 
+					multiple transactions are executed concurrently.   
+
+	Here's how it happens:
+
+	Transaction 1 
+		reads a set of rows from a table that meet certain criteria 
+			(e.g., all employees in the "Sales" department).   
+	Transaction 2 
+		inserts new rows into the table that also meet the criteria of Transaction 1.   
+	Transaction 1 
+		reads the same set of rows again (potentially within the same transaction).   
+	Transaction 1 
+		now sees the 
+			new rows that were inserted by Transaction 2, 
+				which were not present in the first read. 
+				These "new" rows are like phantoms that appeared unexpectedly.   
+	In simpler terms:
+
+		Imagine you're looking for all red cars in a parking lot. 
+		You make a note of all the red cars you see. 
+		While you're still looking, 
+			someone else drives a red car into the parking lot. 
+		When you look again, 
+			you see a new red car that wasn't there before – 
+				it's like a phantom car appeared.
+
+	Why is this a problem?
+
+		Phantom reads can lead to 
+			inconsistent results and 
+			data integrity issues, 
+				especially in applications that rely on 
+					accurate counts or 
+					summaries of data.   
+
+	How to prevent Phantom Reads:
+
+		Higher Isolation Levels: 
+			Using higher isolation levels like 
+				Serializable or 
+				Repeatable Read 
+					can prevent phantom reads. 
+			These levels 
+				typically employ techniques like 
+					locking to prevent other transactions 
+						from modifying data that is 
+							being accessed by a current transaction.   
+
+
+
 Serializable Vs Repeatable read 
+---------------------------------------
+Repeatable Read
+---------------
+	Prevents: 
+		Non-repeatable reads 
+			(where a single transaction reads the same row multiple times, 
+			and gets different values each time). 
+	Allows: 
+		Phantom reads 
+			(where new rows meeting the same criteria as a previous read 
+				appear in subsequent reads 
+					within the same transaction).
+	How it works: 
+		Typically 
+			uses row-level locks 
+				to ensure that 
+					no other transaction can modify a 
+						row that has been read by the current transaction.
+Serializable
+---------------
+	Prevents: 
+		Both non-repeatable reads and phantom reads.
+	How it works: 
+		Employs 
+			stricter locking mechanisms, 
+			often involving predicate locks or 
+			snapshot isolation. 
+		This ensures that the 
+			execution of concurrent transactions is 
+				equivalent to 
+				executing them serially 
+					(one after the other), 
+					preventing any anomalies. 
+	Key Differences
+
+		Phantom Reads: 
+			Repeatable Read 
+				allows phantom reads, 
+				while Serializable prevents them. 
+		Locking: 
+			Serializable 
+				typically uses more restrictive locking mechanisms, 
+				potentially leading to 
+					higher contention and 
+					lower concurrency. 
+		Performance: 
+			Repeatable Read 
+				generally provides 
+					better performance than Serializable 
+						due to less stringent locking.
+	When to Use
+
+		Repeatable Read: 
+			Suitable for most applications 
+				where strong consistency is required, 
+				but the risk of phantom reads is acceptable.
+		Serializable: 
+			Necessary for applications that require the 
+				highest level of isolation, 
+					such as financial systems or 
+					applications where data integrity is paramount. 
+			However, it can impact performance due to increased locking.
+	In Summary:
+
+		Both isolation levels 
+			aim to prevent inconsistencies in 
+				concurrent transactions. 
+		Repeatable Read 
+			provides a good balance between 
+				consistency 
+				and 
+				performance, 
+		Serializable 
+			offers the highest level of consistency 
+			but may have a higher performance overhead. 
+		The choice of isolation level depends on the specific requirements of the application.
+
+
 Eventual Consistency 
+--------------------------
+	Eventual Consistency 
+		consistency model used in distributed systems, 
+			particularly in those that prioritize 
+				availability and 
+				fault tolerance 
+					over immediate consistency.
+
+	Here's a breakdown:
+
+	Core Principle:
+
+	Guarantees that 
+		if no new updates are made to a given data item, 
+			all accesses to that item will eventually 
+				return the last updated value.
+
+	Essentially, 
+		it means that data will 
+			eventually be consistent 
+				across all replicas in the system, 
+				but there might be 
+					temporary inconsistencies 
+					during the replication process.
+	Key Characteristics:
+
+		High Availability: 
+			Systems with (e.g. NoSQL)
+				eventual consistency 
+					can tolerate network partitions and 
+					node failures, 
+					ensuring 
+						high availability 
+							even in challenging environments.
+				but cannot gurantee consistency  			
+		Scalability: 
+			Well-suited for distributed systems that 
+				need to handle 
+					large volumes of data and 
+					high write throughput.
+		Limited Consistency Guarantees:
+			Does not guarantee immediate consistency.
+			May experience temporary inconsistencies during replication.
+			Reads may return stale data for a brief period.
+	Examples:
+
+		DNS (Domain Name System): 
+			DNS servers replicate data, 
+			but changes may take some time to propagate across all servers.
+		Social Media Feeds: 
+			Updates to a user's status 
+				may not be immediately visible to all followers.
+		Distributed Caching Systems: 
+			Caches may have slightly outdated data 
+				while they are being updated from the primary source.
+	When to Use Eventual Consistency:
+
+		Applications that can tolerate temporary inconsistencies.
+		Systems that prioritize 
+			high availability and 
+			fault tolerance 
+				over strong consistency.
+		Distributed systems with large datasets and high write throughput.
 
 ---------------------------------------------------------------------
 	Master/slave architecture 
@@ -151,9 +374,10 @@ Data Integrity:
 		through features like 
 			primary keys (unique identifiers) and 
 			data types, 
-			minimize errors and 
-			ensure data accuracy.
-	ACID properties 
+				minimize errors and 
+				ensure data accuracy.
+	ACID properties
+			(more on this latter)
 		Atomicity, 
 		Consistency, 
 		Isolation, 
@@ -179,7 +403,8 @@ Standardized Access:
 			easier data manipulation and 
 			querying across different software systems 
 				that support SQL.
-	
+
+continue from here Jan, 20, 2025	
 ---------------------------------------------------------------------
 	Evolution and History of RDBMS
 ---------------------------------------------------------------------
@@ -268,6 +493,8 @@ Edgar F. Codd, a computer scientist at IBM,
 			due to its 
 				structured data organization and 
 				strong data integrity features.
+
+
 	
 ---------------------------------------------------------------------
 	ACID properties
@@ -375,6 +602,13 @@ Isolation:
 			a transaction reads the same data twice and 
 				gets different results because 
 					another transaction committed a change in between.
+		Default isolation level in Oracle Database 		
+			prevents dirty reads 
+				(reading uncommitted data) but 
+				allows non-repeatable reads and phantom reads.
+
+ 
+					
 	REPEATABLE READ (REPEATABLE READ):
 
 		Transactions can see data committed by 
@@ -387,7 +621,11 @@ Isolation:
 			transaction might not see rows 
 				inserted by other transactions 
 					after it began reading.
-					
+		Default isolation level in MySQL database 			
+			prevents dirty reads and non-repeatable reads, 
+			but may allow phantom reads.		
+			MySQL snapshot read for implementing this.
+		
 		two ways to achieve 
 			1. Lock the row
 				Serializability (next option)
@@ -882,6 +1120,105 @@ Additional Security Considerations:
 		Conduct periodic security audits to 
 			identify vulnerabilities and 
 			ensure the effectiveness of security measures.
+			
+
+---------------------------------------------------------------------
+	Transactions management in database
+---------------------------------------------------------------------
+			
+			
+Transactions in a database 
+	fundamental concept 
+	ensure 
+		data integrity and 
+		consistency, 
+			especially in environments with concurrent access.
+
+Key Concepts
+
+	Unit of Work: 
+		A transaction 
+			single logical unit of work that 
+			comprises one or more operations 
+				(e.g., read, write, update, delete) on the database.
+	ACID Properties: 
+		Transactions must adhere to the ACID properties:
+	Atomicity: 
+		All operations within a transaction 
+			executed as a single, indivisible unit. 
+		Either 
+			all operations succeed, or 
+			none of them do. 
+			If any operation fails, 
+				entire transaction is rolled back, 
+				leaving the database in its original state.
+	Consistency: 
+		A transaction 
+			must leave the database in a consistent state. 
+			i.e. transaction 
+				must not violate any 
+					constraints or 
+					rules 
+						defined for the database (e.g., foreign key constraints).
+	Isolation: 
+		Concurrent transactions 
+			should not interfere with each other. 
+		The effects of one transaction should not be visible to other concurrent transactions 
+			until the first transaction is committed. 
+		This prevents anomalies like 
+			dirty reads, 
+			non-repeatable reads, and 
+			phantom reads.
+	Durability: 
+		Once a transaction is committed, 
+			its changes are permanently recorded in the database and 
+			will survive system failures (e.g., power outages, crashes).
+Transaction Management
+
+	Concurrency Control: 
+		Techniques used to 
+			manage concurrent access to the database and 
+			ensure data consistency.
+	Locking: 
+		A common method where database objects 
+			(rows, tables) are locked 
+				to prevent other transactions from 
+					accessing 
+					or 
+					modifying them. 
+		Different types of locks include 
+			shared locks (for reading) and 
+			exclusive locks (for writing).
+	Timestamping: 
+		Assigns timestamps to transactions and 
+			uses them to determine the order of execution.
+	Multi-version Concurrency Control (MVCC): 
+		Creates multiple versions of data to allow concurrent transactions 
+			to read without blocking each other.
+Example
+
+Imagine a bank transfer transaction:
+
+	Read: 
+		Read the current balance from the sender's account.
+	Deduct: 
+		Deduct the amount from the sender's account.
+	Credit: 
+		Credit the amount to the recipient's account.
+	Update: 
+		Update the balances in both accounts.
+If any of these steps fail (e.g., insufficient funds, network error), the entire transaction should be rolled back, ensuring that the sender's account is not debited without the recipient's account being credited.
+
+Benefits of Transactions
+
+	Data Integrity: 
+		Ensures data consistency and prevents data corruption.
+	Concurrency Control: 
+		Allows multiple users to access and modify the database concurrently without interfering with each other.
+	Reliability: 
+		Provides a mechanism for recovering from failures and ensuring that data is not lost.
+	Atomicity: 
+		Guarantees that all-or-nothing behavior of operations within a transaction.			
 ---------------------------------------------------------------------
 	Codd's rules 
 ---------------------------------------------------------------------
@@ -1008,6 +1345,113 @@ These rules provide a framework for building robust and reliable relational data
 Although not all RDBMS implementations strictly adhere to every rule, 
 	understanding these principles gives you a strong foundation for working with relational databases and ensuring data 
 		quality and consistency.
+
+
+---------------------------------------------------------------------
+	Database schema design 
+---------------------------------------------------------------------
+
+Use Case: Online Bookstore
+
+Requirement: Design a database schema for an online bookstore that tracks books, authors, customers, and orders.
+
+Entities and Attributes:
+
+Book:
+
+book_id (INT, PRIMARY KEY, AUTO_INCREMENT)
+title (VARCHAR(255), NOT NULL) 
+author_id (INT, NOT NULL)
+isbn (VARCHAR(13), UNIQUE, NOT NULL)
+price (DECIMAL(10, 2), NOT NULL)
+publication_year (INT)
+Author:
+
+author_id (INT, PRIMARY KEY, AUTO_INCREMENT)
+first_name (VARCHAR(50), NOT NULL)
+last_name (VARCHAR(50), NOT NULL)
+Customer:
+
+customer_id (INT, PRIMARY KEY, AUTO_INCREMENT)
+first_name (VARCHAR(50), NOT NULL)
+last_name (VARCHAR(50), NOT NULL)
+email (VARCHAR(255), UNIQUE, NOT NULL) 
+address (TEXT)
+Order:
+
+order_id (INT, PRIMARY KEY, AUTO_INCREMENT)
+customer_id (INT, NOT NULL)
+order_date (DATE, NOT NULL) 
+Order_Item:
+
+order_id (INT, NOT NULL)
+book_id (INT, NOT NULL)
+quantity (INT, NOT NULL)
+price (DECIMAL(10, 2), NOT NULL)
+Note: This field can be redundant, as it can be derived from the Book table. However, storing it here can improve performance for order summaries.
+Relationships:
+
+One-to-Many: An author can write multiple books. 
+One-to-Many: A customer can place multiple orders.
+Many-to-Many: An order can contain multiple books. 
+Database Schema (SQL Example):
+
+SQL
+
+CREATE TABLE Author (
+    author_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL
+);
+
+CREATE TABLE Book (
+    book_id INT AUTO_INCREMENT PRIMARY KEY,
+    title VARCHAR(255) NOT NULL,
+    author_id INT NOT NULL,
+    isbn VARCHAR(13) UNIQUE NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    publication_year INT,
+    FOREIGN KEY (author_id) REFERENCES Author(author_id)
+);
+
+CREATE TABLE Customer (
+    customer_id INT AUTO_INCREMENT PRIMARY KEY,
+    first_name VARCHAR(50) NOT NULL,
+    last_name VARCHAR(50) NOT NULL,
+    email VARCHAR(255) UNIQUE NOT NULL,
+    address TEXT
+);
+
+CREATE TABLE Order (
+    order_id INT AUTO_INCREMENT PRIMARY KEY,
+    customer_id INT NOT NULL,
+    order_date DATE NOT NULL,
+    FOREIGN KEY (customer_id) REFERENCES Customer(customer_id)
+);
+
+CREATE TABLE Order_Item (
+    order_id INT,
+    book_id INT,
+    quantity INT NOT NULL,
+    price DECIMAL(10, 2) NOT NULL,
+    PRIMARY KEY (order_id, book_id), -- Composite primary key
+    FOREIGN KEY (order_id) REFERENCES Order(order_id),
+    FOREIGN KEY (book_id) REFERENCES Book(book_id)
+);
+Indexing:
+
+Book:
+INDEX idx_book_author (author_id): To efficiently find books by author.
+INDEX idx_book_isbn (isbn): To efficiently find books by ISBN.
+Order:
+INDEX idx_order_customer (customer_id): To efficiently find orders placed by a specific customer.
+Order_Item:
+INDEX idx_order_item_order (order_id): To efficiently find order items for a specific order.
+Note:
+
+This is a simplified example, and the actual database design may need to be adjusted based on specific requirements and performance considerations.
+This schema demonstrates the use of primary keys, foreign keys, unique constraints, and NOT NULL constraints to ensure data integrity.
+Indexing is crucial for improving query performance, especially for frequently accessed data.
 
 ---------------------------------------------------------------------
 Module 3	Module 3: Introduction to SQL
@@ -2150,7 +2594,7 @@ Try it
 	
 	Understanding primary keys vs. secondary keys
 
-continue from here 
+
 	secondary key 
 		any index that is not the primary key. 
 		Improve performance 
@@ -2193,7 +2637,7 @@ Secondary keys
 			
 			primary and secondary keys 
 				are still related to each other
-continue from here 14th May, 2024
+
 	Understanding primary and secondary key relationship
 	----------------------------------------------------
 	For e.g. 
@@ -3062,9 +3506,13 @@ Foreign keys in MySQL
 	In this video, we will explore the concept of foreign keys and how they can be used to build and maintain data relationships within relational databases.
 
 	Foreign keys vs. foreign key constraints
-	To start, it's important to understand the difference between foreign keys and foreign key constraints. A foreign key is a column or set of columns in a table that references the primary key of another table. This enables related data to be linked together in separate tables.
+	To start, it's important to understand the difference between foreign keys and foreign key constraints. 
+	A foreign key is a column or set of columns in a table that references the primary key of another table. 
+	This enables related data to be linked together in separate tables.
 
-	On the other hand, a foreign key constraint is a condition that ensures the referential integrity of the data by enforcing a relationship between the foreign key and the referenced primary key. This means that the constraint will guarantee that all data references are valid and consistent, preventing data from being added, updated, or deleted in a way that would break the relationships between tables.
+	On the other hand, a foreign key constraint is a condition that ensures the referential integrity of the 
+		data by enforcing a relationship between the foreign key and the referenced primary key. 
+		This means that the constraint will guarantee that all data references are valid and consistent, preventing data from being added, updated, or deleted in a way that would break the relationships between tables.
 
 	It's worth noting that foreign keys can exist without constraints, but constraints are helpful to maintain referential integrity. Constraints also require additional computation to maintain, so at a certain scale, you may need to consider dropping some constraints if they become too costly in terms of performance.
 
@@ -4087,7 +4535,7 @@ Remember, the specific syntax and available ALTER commands might vary depending 
 
 
 
-
+continue from here 
 ---------------------------------------------------------------------
 	DROP Statement
 ---------------------------------------------------------------------
@@ -6913,7 +7361,56 @@ Module 17	Module 17: Introduction to NoSQL
 
 
 
-For below it is better we cover it in a different page.
+Introduction to NoSQL
+	NoSQL, which stands for "not only SQL" or "non-relational", refers to a category of database management systems (DBMS) that differ from traditional relational databases. Here's a breakdown of key concepts:
+
+Relational vs. NoSQL Databases:
+
+Relational Databases:
+
+	Store data in structured tables with rows and columns.
+	Enforce relationships between tables using foreign keys.
+	Utilize SQL (Structured Query Language) for data manipulation.
+	Well-suited for structured, pre-defined data models.
+NoSQL Databases:
+
+	Offer more flexible data models: document, key-value, graph, etc.
+	Do not rely on rigid table structures.
+	Often employ different query languages or APIs for data access.
+	Provide scalability and performance advantages for large datasets or unstructured data.
+Why Use NoSQL?
+
+	Several factors contribute to the growing popularity of NoSQL databases:
+
+		Scalability: NoSQL databases can easily scale horizontally by adding more servers to handle growing data volumes.
+		Flexibility: NoSQL schemas can adapt to changing data structures without complex schema migrations.
+		Performance: NoSQL databases can deliver faster performance for specific operations, particularly with large datasets.
+		Big Data: NoSQL excels at handling massive datasets that might overwhelm traditional relational databases.
+		Unstructured Data: NoSQL is well-suited for storing and managing unstructured data like JSON documents or social media content.
+Types of NoSQL Databases:
+
+	Document Stores: Data is stored as key-value pairs where the value is a JSON-like document containing rich data structures. (e.g., MongoDB, Couchbase)
+	Key-Value Stores: Simplest NoSQL type, data is stored as key-value pairs with atomic operations (add, update, delete). (e.g., Redis, Memcached)
+	Wide-Column Stores: Designed for large datasets with variable-length columns. Useful for time-series data or sensor readings. (e.g., Cassandra, ScyllaDB)
+	Graph Databases: Represent data as nodes (entities) and edges (relationships) for efficient querying of interconnected data. (e.g., Neo4j, Titan)
+Choosing the Right NoSQL Database:
+
+The selection of a NoSQL database depends on your specific needs:
+
+	Data Model: Consider the structure and complexity of your data.
+	Scalability Requirements: How much data growth do you anticipate?
+	Performance Needs: Prioritize read/write speeds or query complexity.
+	Data Access Patterns: How will you typically access and manipulate the data?
+Benefits of NoSQL:
+
+	Scalability and Performance: Efficiently handle large datasets and high traffic.
+	Flexibility: Adapt to evolving data models without schema restrictions.
+	Improved Developer Experience: Simpler development for specific use cases.
+Challenges of NoSQL:
+
+	ACID Transactions: NoSQL databases often offer weaker consistency guarantees compared to relational databases.
+	Querying: NoSQL querying languages might differ from familiar SQL, requiring a learning curve.
+	Data Integrity: Maintaining data consistency across a distributed NoSQL system can be more complex.
 
 
 ---------------------------------------------------------------------
@@ -6921,25 +7418,395 @@ For below it is better we cover it in a different page.
 ---------------------------------------------------------------------
 
 
+NoSQL, standing for "not only SQL" or "non-relational," refers to a category of database management systems (DBMS) that differ from traditional relational databases in their structure and capabilities. Here's a breakdown of what NoSQL offers:
 
+Core Concept:
+
+Relational databases store data in rigid, predefined tables with rows and columns. They enforce relationships between tables using foreign keys and rely on SQL for data manipulation.
+NoSQL databases, on the other hand, provide more flexibility. They offer various data models, including document, key-value, graph, and wide-column, allowing for a more dynamic approach to storing and managing data.
+Why Use NoSQL?
+
+Several factors make NoSQL a compelling choice for specific scenarios:
+
+Scalability: NoSQL systems excel at horizontal scaling. By adding more servers, you can easily handle growing data volumes without performance bottlenecks.
+Flexibility: Unlike relational databases with predefined schemas, NoSQL allows for evolving data structures. You can adapt your data model as your needs change without complex schema migrations.
+Performance: NoSQL databases often deliver faster performance for specific operations, particularly when dealing with large or unstructured datasets.
+Big Data: NoSQL is well-suited for managing massive datasets that might overwhelm traditional relational databases.
+Unstructured Data: NoSQL excels at storing and handling unstructured data like JSON documents, social media content, or sensor readings.
 ---------------------------------------------------------------------
 	Evolution and History of NoSQL
 ---------------------------------------------------------------------
 
+The concept of NoSQL databases has evolved significantly over time, becoming a cornerstone for handling massive datasets and diverse data structures. Here's a glimpse into NoSQL's history and evolution:
+
+Early Days (1960s - 1990s):
+
+Non-relational Roots: The seeds of NoSQL were sown in the 1960s with the development of non-relational databases like IBM's IMS (Integrated Management System) and hierarchical databases like CODASYL (Conference on Data Systems Languages).
+Focus on Specific Needs: These early systems catered to specific use cases, offering performance and flexibility advantages for certain data types.
+The Birth of "NoSQL" (Late 1990s - Early 2000s):
+
+Coining the Term: The term "NoSQL" first appeared in 1998, used by Carlo Strozzi to describe his lightweight relational database that didn't utilize the standard SQL interface.
+Rise of Web 2.0: The explosion of web applications in the early 2000s, characterized by user-generated content and social interaction, demanded new data management solutions.
+Relational Limitations: Traditional relational databases struggled to handle the scale, flexibility, and variety of data generated by Web 2.0 applications.
+The NoSQL Boom (Mid 2000s - Present):
+
+A Surge in Popularity: As web applications continued to grow, NoSQL databases gained significant traction. Open-source projects like MongoDB and Cassandra emerged, offering scalable and flexible alternatives for data storage.
+Diversification of NoSQL Stores: Different types of NoSQL databases like document stores, key-value stores, and wide-column stores became prominent, each catering to specific data models and access patterns.
+Cloud Adoption: The rise of cloud computing further fueled NoSQL adoption. Cloud platforms offered readily available NoSQL database services, making it easier for developers to leverage their capabilities.
+The Present and Future of NoSQL:
+
+Polyglot Persistence: Today, many applications utilize a combination of relational and NoSQL databases, choosing the right tool for the job based on data characteristics and access patterns.
+Focus on Integration: Solutions are emerging to bridge the gap between relational and NoSQL databases, allowing for seamless data movement and querying across systems.
+New Use Cases: NoSQL continues to evolve, finding applications in areas like Internet of Things (IoT) data management, real-time analytics, and complex graph-based relationships.
+Key Takeaways:
+
+NoSQL databases have come a long way, from niche solutions to mainstream data management tools.
+Their evolution reflects the changing nature of data and the demands of modern applications.
+The future of NoSQL lies in continuous innovation, integration with other systems, and addressing new data challenges.
+
+---------------------------------------------------------------------
+	Key-Value Stores
+---------------------------------------------------------------------
+
+Key-value stores, as you've learned, are a fundamental type of NoSQL database designed for simplicity, speed, and scalability. They function differently from relational databases and offer unique advantages for specific use cases.
+
+Core Functionality:
+
+Data Model: Unlike relational databases with structured tables and rows, key-value stores operate on a key-value pair model. Each data item is associated with a unique key that acts as an identifier.
+Values: The value stored can be any data type, including strings, numbers, JSON documents, or even entire objects, providing flexibility in data representation.
+Basic Operations:
+
+Key-value stores provide essential operations for interacting with data:
+
+SET: Add a new key-value pair or update an existing one.
+GET: Retrieve the value associated with a specific key.
+DELETE: Remove a key-value pair from the store.
+Strengths of Key-Value Stores:
+
+Simplicity: The key-value model is easy to understand and implement, reducing development complexity.
 
 
 ---------------------------------------------------------------------
-	Key-Value Stores, Document Stores, Column Stores, Graph Databases
+	Document Stores
 ---------------------------------------------------------------------
 
 
+Document stores are another essential category of NoSQL databases, offering a flexible and scalable approach to data storage and retrieval. Here's a breakdown of their key characteristics and use cases:
 
+Core Concept:
+
+Unlike relational databases with rigid tables and rows, document stores utilize a document-oriented data model.
+Documents are self-contained units of data, often stored in JSON (JavaScript Object Notation) format or similar flexible schema formats like YAML or XML.
+Each document can have its own structure, containing various data types like strings, numbers, arrays, and even nested documents. This flexibility allows for storing diverse data without the limitations of predefined tables.
+Advantages of Document Stores:
+
+Flexibility: Document stores excel at handling data with varying structures or that evolves over time. The schema-less nature allows for adding new fields to documents without altering the entire database structure.
+Ease of Use: Working with documents often feels more intuitive for developers familiar with JSON or other similar data formats. This can simplify data manipulation and development.
+Scalability: Document stores can scale horizontally by adding more servers, making them suitable for large datasets.
+Rich Queries: Compared to key-value stores, document stores offer richer querying capabilities. You can query documents based on specific fields or their hierarchical structure using query languages like JSONiq or XPath.
+Common Use Cases:
+
+Content Management Systems (CMS): Documents containing website content, articles, or product information can be efficiently stored and managed in document stores.
+E-commerce Applications: Product data with varying attributes, user profiles, and shopping cart information can be well-represented in document stores.
+Internet of Things (IoT): Sensor data with timestamps, readings, and device-specific details can be flexibly stored using document stores.
+Real-time Analytics: Document stores can be used to store and query real-time data for various analytics applications.
+Social Networking: User profiles, posts, comments, and other social data with varying structures can be managed effectively in document stores.
+Popular Document Stores:
+
+MongoDB: A leading open-source document store known for its flexibility, scalability, and rich query capabilities.
+Couchbase: Another popular open-source document store offering high performance and scalability features.
+Amazon DocumentDB: A managed document database service compatible with MongoDB APIs, offered by Amazon Web Services (AWS).
+---------------------------------------------------------------------
+	Column Stores
+---------------------------------------------------------------------
+
+Column stores, also known as wide-column stores, are a type of NoSQL database designed specifically for handling large datasets with variable-length columns. They offer efficient storage and retrieval mechanisms for data that might not fit well in traditional row-oriented databases.
+
+Core Concept:
+
+Unlike relational databases that store data in rows and columns, column stores organize data by columns instead of rows.
+Each column is stored separately, allowing for efficient compression and optimization of data access. This is particularly beneficial for datasets with many columns but sparse data (where most entries in a column might be empty).
+Column stores are well-suited for scenarios where you primarily query data based on specific columns or perform aggregations across large datasets.
+Advantages of Column Stores:
+
+Efficient Storage: By storing columns separately, column stores can compress data effectively, especially for sparse data. This reduces storage requirements and improves overall efficiency.
+Fast Reads for Specific Columns: Retrieving data from specific columns is significantly faster in column stores compared to row-oriented databases. This is because only the relevant columns need to be accessed, minimizing data transfer.
+Scalability: Column stores can scale horizontally by adding more servers to the cluster, making them ideal for handling massive datasets that grow over time.
+Aggregations and Analytics: Column stores excel at performing aggregations (e.g., sum, average, count) across large datasets due to their column-based organization.
+Common Use Cases:
+
+Time-Series Data:
+---------------------------------------------------------------------
+	Graph Databases
+---------------------------------------------------------------------
+In the realm of NoSQL databases, graph databases stand out for their unique ability to represent and manage interconnected data. Here's a deep dive into what graph databases are and how they excel in specific use cases:
+
+Core Concept:
+
+Unlike relational databases that focus on tables and rows, graph databases utilize a graph data model. This model consists of nodes (entities) and edges (relationships) between those entities.
+Nodes represent real-world objects like people, products, or social media posts.
+Edges depict the connections and relationships between these nodes, allowing you to capture the inherent interconnectedness of your data.
+Why Use Graph Databases?
+
+Graph databases offer distinct advantages for specific scenarios:
+
+Modeling Relationships: They excel at representing complex relationships between data entities. This is particularly valuable for tasks like social network analysis, recommendation systems, or fraud detection.
+Efficient Queries: Traversing interconnected data in a graph database is often faster and more efficient compared to joining multiple tables in a relational database.
+Scalability: Graph databases can scale horizontally by adding more servers to handle growing datasets and complex queries involving relationships.
+Common Use Cases:
+
+Social Networks: Graph databases are a natural fit for modeling social connections between users, analyzing user behavior, and recommending content or friends.
+Fraud Detection: By analyzing relationships between transactions, entities, and locations, graph databases can help identify fraudulent activities.
+Knowledge Graphs: Complex knowledge graphs containing entities, relationships, and properties can be effectively stored and queried using graph databases. This can be useful for building intelligent systems or chatbots.
+Supply Chain Management: Tracking the movement of goods, materials, and their relationships with suppliers and vendors can be efficiently managed in graph databases.
+Recommendation Systems: Analyzing user interactions and relationships between items can power personalized recommendations for products, content, or services.
+Popular Graph Databases:
+
+Neo4j: A leading open-source graph database known for its ease of use, scalability, and powerful query language (Cypher).
+Titan: Another open-source graph database offering high performance and flexibility for large graphs.
+Amazon Neptune: A managed graph database service from Amazon Web Services (AWS) designed for ease of use and scalability.
+Things to Consider:
+
+Learning Curve: Understanding the graph data model and query languages like Cypher might require additional learning compared to working with relational databases.
+Schema Design: Designing an effective graph schema is crucial for optimal performance and query efficiency.
+Data Model Compatibility: Not all data can be easily represented in a graph model. Evaluate if your data lends itself well to relationships and interconnectedness.
+Choosing Graph Databases:
+
+Graph databases are a powerful tool when:
+
+Your data has inherent relationships and interconnectedness that you want to model and analyze.
+You need to perform complex queries that involve traversing relationships between data entities.
+Scalability and efficient querying of interconnected data are crucial for your application.
+If your data primarily 
+
+---------------------------------------------------------------------
+New Module Added: Backup and Recovery in database 
+---------------------------------------------------------------------
+
+
+Backup and Recovery in Databases
+
+1. What is Backup?
+
+	Definition: A backup is a copy of your database files, stored separately from the primary database server.
+	Purpose: To protect your data from loss due to:
+	Hardware failures: Server crashes, disk failures
+	Software errors: Corrupted data files, software bugs
+	Human error: Accidental deletions, data modifications
+	Natural disasters: Fires, floods, earthquakes
+	Cyberattacks: Ransomware, hacking attempts
+2. Types of Backups
+
+	Full Backup: Copies the entire database, including all data files, logs, and control files.
+	Pros: Easy to restore, provides a complete recovery point.
+	Cons: Time-consuming, requires significant storage space.
+	Differential Backup: Copies only the data that has changed since the last full backup.
+	Pros: Faster and smaller than full backups.
+	Cons: Requires a recent full backup for recovery.
+	Incremental Backup: Copies only the data that has changed since the last backup (full or incremental).
+	Pros: Fastest backup type, requires minimal storage space.
+	Cons: Requires multiple backups for full recovery.
+	Log-Based Backup: Copies the transaction log, which records all changes made to the database.
+	Pros: Fast and efficient for point-in-time recovery.
+	Cons: Requires a recent full or differential backup for recovery.
+3. Recovery Strategies
+
+	Recovery Point Objective (RPO): The maximum amount of data loss that an organization can tolerate.
+
+	Recovery Time Objective (RTO): The target time within which a system must be restored to operation after a failure.
+
+	Recovery Methods:
+
+	Rollback: Reverts the database to a previous consistent state using backups and transaction logs.
+	Rollforward: Applies the transaction log to a backup to bring the database to the current state.
+	Media Recovery: Recovers the database from a complete backup and applies necessary log files.
+4. Best Practices
+
+	Regular Backups: Schedule regular backups (e.g., daily, weekly, monthly) based on data criticality and RPO/RTO requirements.
+	Off-site Storage: Store backups off-site (e.g., in a cloud service, on a separate server) to protect against local disasters.
+	Test Backups: Regularly test backup and recovery procedures to ensure they work as expected.
+	Data Encryption: Encrypt backups to protect sensitive data during storage and transmission.
+	Version Control: Keep multiple versions of backups to enable point-in-time recovery.
+	Disaster Recovery Plan: Develop and maintain a comprehensive disaster recovery plan that outlines procedures for responding to different types of failures.
+5. Database-Specific Features
+
+	Most modern databases (e.g., Oracle, MySQL, SQL Server) provide built-in features for backup and recovery, including:
+	Backup and recovery utilities.
+	Log management tools.
+	Point-in-time recovery options.
+
+
+
+
+
+----------
+Instruction to do database backup and recovery in mysql
+----------------------------------------------------------------
+
+1. Full Backup
+
+Logical Backup:
+
+ 
+
+mysqldump -u <username> -p<password> <database_name> > /path/to/backup/full_backup_<date>.sql
+This command creates a SQL script containing all the database objects (tables, views, stored procedures, etc.) and their data.
+
+Physical Backup:
+
+ 
+
+mysqldump -u <username> -p<password> --single-transaction <database_name> > /path/to/backup/full_backup_<date>.sql
+This option minimizes the risk of inconsistencies by performing the backup within a single transaction.
+
+2. Differential Backup
+
+Create a script (e.g., differential_backup.sh):
+
+ 
+
+#!/bin/ 
+
+timestamp=$(date +%Y%m%d%H%M%S) 
+mysqldump -u <username> -p<password> --databases <database_name> --master-data=2 > /path/to/backup/differential_backup_$timestamp.sql 
+3. Incremental Backup
+
+Create a script (e.g., incremental_backup.sh):
+
+ 
+
+#!/bin/ 
+
+timestamp=$(date +%Y%m%d%H%M%S) 
+mysqldump -u <username> -p<password> --databases <database_name> --master-data=2 --incremental > /path/to/backup/incremental_backup_$timestamp.sql 
+4. Scheduling Backups (with cron)
+
+Full backups daily:
+
+Code snippet
+
+0 2 * * * /path/to/full_backup.sh
+Differential backups hourly:
+
+Code snippet
+
+0 * * * * /path/to/differential_backup.sh
+5. Database Recovery
+
+Full Recovery:
+
+ 
+
+mysql -u <username> -p<password> <database_name> < /path/to/backup/full_backup_<date>.sql
+Differential Recovery:
+
+ 
+
+mysql -u <username> -p<password> <database_name> < /path/to/backup/full_backup_<date>.sql 
+mysql -u <username> -p<password> <database_name> < /path/to/backup/differential_backup_<date>.sql
+Incremental Recovery:
+
+ 
+
+mysql -u <username> -p<password> <database_name> < /path/to/backup/full_backup_<date>.sql
+mysql -u <username> -p<password> <database_name> < /path/to/backup/incremental_backup_<date1>.sql
+mysql -u <username> -p<password> <database_name> < /path/to/backup/incremental_backup_<date2>.sql 
+...
+Important Notes:
+
+Replace placeholders:
+<username>
+<password>
+<database_name>
+/path/to/backup/
+Permissions: Ensure the user running the backup scripts has the necessary permissions.
+Test Backups: Regularly test your backups to ensure they can be restored successfully.
+Security: Consider encrypting your backups to enhance security.
+Off-site Storage: Store backups off-site for disaster recovery.
+MySQL Documentation: Refer to the official MySQL documentation for the most up-to-date and detailed information on backup and recovery procedures.
+This detailed guide should help you effectively implement database backup and recovery strategies for your MySQL environment.
+
+
+More details: https://phoenixnap.com/kb/how-to-backup-restore-a-mysql-database
 
 ---------------------------------------------------------------------
 Module 18	Module 18: Types of NoSQL databases
 ---------------------------------------------------------------------
 
+NoSQL databases come in various types, each with its own strengths and weaknesses. Here are some of the most common types: 
 
+1. Document Databases:
+
+	Data Model: 
+		Stores data in flexible, 
+		document-like structures (e.g., JSON, BSON). 
+	Key Features:
+		Schema-less or flexible schemas. 
+	Easy to 
+		store complex, hierarchical data. 
+	Good for applications with 
+		frequent data updates and 
+		evolving data structures. 
+	Examples: 
+		MongoDB, 
+		Couchbase, 
+		DocumentDB 
+2. Key-Value Stores:
+
+	Data Model: 
+		Stores data as key-value pairs. 
+	Key Features:
+		Simple and fast for 
+			basic data retrieval and storage. 
+		Ideal for 
+			caching, 
+			session management, and 
+			storing simple data structures. 
+		High performance and scalability. 
+	Examples: 
+		Redis, 
+		Memcached, 
+		Amazon ElastiCache 
+3. Column-Family Stores (Wide-Column Stores): 
+
+	Data Model: 
+		Stores data in columns, 
+			where each column represents a specific attribute. 
+	Key Features:
+		Efficient for storing and querying large amounts of data columnwise. 
+		Well-suited for analytics and time-series data.
+	Examples: 
+		Cassandra, 
+		HBase, 
+		Amazon DynamoDB 
+4. Graph Databases:
+
+	Data Model: 
+		Stores data as a 
+			network of interconnected nodes (entities) and 
+			relationships. 
+	Key Features:
+		Excellent for representing and querying complex relationships between data points. 
+		Used for social networks, recommendation engines, and knowledge graphs. 
+	Examples: 
+		Neo4j, 
+		JanusGraph, 
+		Dgraph 
+5. Time-Series Databases:
+
+	Data Model:
+		Specifically designed for handling time-stamped data. 
+	Key Features:
+		High write throughput and efficient querying of time-series data. 
+		Used for 
+			IoT data, 
+			financial data, and 
+			monitoring applications. 
+	Examples: 
+		InfluxDB, 
+		TimescaleDB
+
+ 
 ---------------------------------------------------------------------
 	Key-Value Stores (e.g., Redis)
 ---------------------------------------------------------------------
@@ -6964,7 +7831,7 @@ Module 18	Module 18: Types of NoSQL databases
 ---------------------------------------------------------------------
 	Graph Databases (e.g., Neo4j)
 ---------------------------------------------------------------------
-
+D:\PraiseTheLord\HSBGInfotech\Others\vilas\nosql\neo4j
 
 ---------------------------------------------------------------------
 Module 19	Module 19: MongoDB: An introduction
@@ -6999,3 +7866,6 @@ Module 19	Module 19: MongoDB: An introduction
 Reference: 	
 https://www.w3schools.com/MySQL/default.asp
 https://www.mysqltutorial.org/mysql-basics/
+
+	
+	select ifnull(courses.course_name, 'No Course') from students right left outer join courses where students.course_id = courses.course_id;
