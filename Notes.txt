@@ -1,4 +1,4 @@
-sData testing
+Data testing
 	D:\PraiseTheLord\HSBGInfotech\DataTesting
 
 SQL
@@ -404,7 +404,7 @@ Standardized Access:
 			querying across different software systems 
 				that support SQL.
 
-continue from here Jan, 20, 2025	
+	
 ---------------------------------------------------------------------
 	Evolution and History of RDBMS
 ---------------------------------------------------------------------
@@ -535,6 +535,7 @@ Atomicity:
 		or neither is affected (no transfer occurs).
 Consistency:
 
+	Data is said to be consistent if it remains the same through the life of a transaction 
 	Guarantees 
 		transaction maintains the data according 
 			to pre-defined rules (constraints).
